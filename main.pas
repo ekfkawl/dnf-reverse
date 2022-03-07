@@ -63,13 +63,13 @@ begin
 
       local:= MapCharicter;
 
-      // ÄüÅ°
+      // quick key
       if (swQuickKey) And (GetKeyStateEx(Ord('X'))) then
       begin
         Inoutput(DirectInput8.X);
       end;
 
-      // ´ë½Ã
+      // auto dash
       if (swAutoDash) And (GetKeyStateEx(VK_SHIFT)) then
       begin
         Output(DirectInput8.SHIFT);
