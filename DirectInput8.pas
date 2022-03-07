@@ -3,7 +3,7 @@ unit DirectInput8;
 interface
 
 uses
-  Windows, MemAPI;
+  SysUtils, Windows, MemAPI;
 
 const
   N1 = 2;

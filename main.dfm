@@ -19,7 +19,20 @@ object _: T_
     Width = 97
     Height = 17
     Caption = 'quick key'
+    Checked = True
+    State = cbChecked
     TabOrder = 0
     OnClick = CheckBox1Click
+  end
+  object CheckBox2: TCheckBox
+    Left = 32
+    Top = 56
+    Width = 97
+    Height = 17
+    Caption = 'auto dash'
+    Checked = True
+    State = cbChecked
+    TabOrder = 1
+    OnClick = CheckBox2Click
   end
 end

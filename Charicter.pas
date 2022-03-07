@@ -1,13 +1,13 @@
 unit Charicter;
 
 interface
-  uses Windows, MemAPI;
+  uses SysUtils, Windows, TlHelp32, PsAPI, MemAPI;
 
-type TVector3 = record
+type TVector3 = packed record
   x, y, z: Single;
 end;
 
-type TIVector3 = record
+type TIVector3 = packed record
   x, y, z: Integer;
 end;
 
@@ -25,7 +25,7 @@ type TCharicter = packed record
   _u2: Array [1..$18] of Byte; {0x188}
   pMotion: Pointer; {0x1A0}
   _u3: Array [1..$180] of Byte; {0x1A8}
-  Position: ^TVector3; {0x328}
+  _Position: ^TVector3; {0x328}
   _u4: Array [1..$220] of Byte; {0x330}
   dMotion: DWORD64; {0x550}
   _u5: Array [1..$8A8] of Byte; {0x558}
@@ -59,8 +59,12 @@ type TCharicter = packed record
   _u12: Array [1..$37B0] of Byte; {0x5890}
   skillKey: DWORD64; {0x9040}
 
+  const LEFT = 0;
+  const RIGHT = 1;
   function Direction: Byte;
+  function Position: TVector3;
 end;
+
 
 function MapCharicter(const dwBase: DWORD64): TCharicter; overload;
 function MapCharicter: TCharicter; overload;
@@ -88,6 +92,17 @@ end;
 function TCharicter.Direction: Byte;
 begin
   Result:= rd1(rd4(Self.pDirection + 8) + $68);
+end;
+
+
+function TCharicter.Position: TVector3;
+var
+  res: TVector3;
+begin
+  if ReadProcessMemory(hProcess, Ptr(DWORD(Self._Position)), @res, SizeOf(TVector3), PSIZE_T(nil)^) then
+    Result:= res
+  else
+    raise EAbort.Create('');
 end;
 
 end.

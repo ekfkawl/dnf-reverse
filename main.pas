@@ -9,8 +9,10 @@ uses
 type
   T_ = class(TForm)
     CheckBox1: TCheckBox;
+    CheckBox2: TCheckBox;
     procedure FormCreate(Sender: TObject);
     procedure CheckBox1Click(Sender: TObject);
+    procedure CheckBox2Click(Sender: TObject);
   private
     { Private declarations }
   public
@@ -25,7 +27,8 @@ var
   dwCBase,
   dwLocal: DWORD64;
 
-  swQuickKey: Boolean;
+  swQuickKey: Boolean = True;
+  swAutoDash: Boolean = True;
 
 implementation
 
@@ -48,17 +51,58 @@ begin
 end;
 
 procedure Callback1;
+var
+  local: TCharicter;
 begin
   while True do
   begin
     Sleep(1);
-    if not IsActiveWindow then
-      Continue;
+    try
+      if not IsActiveWindow then
+        Continue;
 
-    if (swQuickKey) And (GetKeyStateEx(Ord('X'))) then
-    begin
-      Inoutput(DirectInput8.X);
+      local:= MapCharicter;
+
+      // ÄüÅ°
+      if (swQuickKey) And (GetKeyStateEx(Ord('X'))) then
+      begin
+        Inoutput(DirectInput8.X);
+      end;
+
+      // ´ë½Ã
+      if (swAutoDash) And (GetKeyStateEx(VK_SHIFT)) then
+      begin
+        Output(DirectInput8.SHIFT);
+        if local.pMotion = local.pMWalk then
+        begin
+          var sink:= False;
+          if (GetKeyStateEx(VK_LEFT)) And (not GetKeyStateEx(VK_RIGHT)) And (local.Direction = local.LEFT) then
+          begin
+            Outinput(DirectInput8.LEFT);
+            sink:= True;
+          end;
+          if (GetKeyStateEx(VK_RIGHT)) And (not GetKeyStateEx(VK_LEFT)) And (local.Direction = local.RIGHT) then
+          begin
+            Outinput(DirectInput8.RIGHT);
+            sink:= True;
+          end;
+
+          if sink then
+          begin
+            if local.pMotion <> local.pMDash then
+              Continue;
+          end;
+
+          if not GetKeyStateEx(VK_LEFT) then
+            Output(DirectInput8.LEFT)
+          else if not GetKeyStateEx(VK_RIGHT) then
+            Output(DirectInput8.RIGHT);
+        end;
+
+      end;
+    except;
     end;
+
   end;
 end;
 
@@ -66,6 +110,12 @@ procedure T_.CheckBox1Click(Sender: TObject);
 begin
   swQuickKey:= CheckBox1.Checked;
 end;
+
+procedure T_.CheckBox2Click(Sender: TObject);
+begin
+  swAutoDash:= CheckBox2.Checked;
+end;
+
 
 procedure SetVariablesWithAOBScan;
 var
@@ -89,11 +139,8 @@ begin
 
   dwCBase:= p.GetModuleBase('DNF.exe');
 
+
   SetVariablesWithAOBScan;
-
-  caption:= MapCharicter.Direction.ToString;
-
-
 
   CreateThread(@Callback1);
 end;
