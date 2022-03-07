@@ -1,0 +1,12 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<BorlandProject>
+	<Transactions>
+    <Transaction>1899-12-30 00:00:00.000.138,=C:\Users\syswo\Documents\Embarcadero\Studio\Projects\Unit1.pas</Transaction>
+    <Transaction>2022-03-07 20:19:35.353,=C:\Users\syswo\Documents\Embarcadero\Studio\Projects\Unit1.pas</Transaction>
+    <Transaction>2022-03-07 20:20:24.349,D:\repository\dnf-reverse\main.pas=C:\Users\syswo\Documents\Embarcadero\Studio\Projects\Unit1.pas</Transaction>
+    <Transaction>2022-03-07 20:20:24.349,D:\repository\dnf-reverse\main.dfm=C:\Users\syswo\Documents\Embarcadero\Studio\Projects\Unit1.dfm</Transaction>
+    <Transaction>2022-03-07 20:21:17.858,D:\repository\dnf-reverse\x64dnf.dproj=C:\Users\syswo\Documents\Embarcadero\Studio\Projects\Project1.dproj</Transaction>
+    <Transaction>2022-03-07 20:28:47.211,D:\repository\dnf-reverse\x64dnf.dproj=D:\repository\dnf-reverse\x64dnf.dproj</Transaction>
+    <Transaction>2022-03-07 20:31:24.887,D:\repository\dnf-reverse\x64dnf.dproj=D:\repository\dnf-reverse\x64dnf.dproj</Transaction>
+  </Transactions>
+</BorlandProject>
