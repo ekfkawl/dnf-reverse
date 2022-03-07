@@ -4,7 +4,7 @@ interface
 
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
-  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, ProcessAPI, Vcl.StdCtrls, DirectInput8;
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, ProcessAPI, Vcl.StdCtrls, DirectInput8, AOBScanAPI, Charicter, MemAPI;
 
 type
   T_ = class(TForm)
@@ -21,6 +21,9 @@ var
   _: T_;
   p: Process;
   hProcess, hWindow: THandle;
+
+  dwCBase,
+  dwLocal: DWORD64;
 
   swQuickKey: Boolean;
 
@@ -64,12 +67,33 @@ begin
   swQuickKey:= CheckBox1.Checked;
 end;
 
+procedure SetVariablesWithAOBScan;
+var
+  t: DWORD64;
+begin
+  ScanStructure.hProcess:= hProcess;
+  ScanStructure.StartAddr:= dwCBase;
+  ScanStructure.EndAddr:= dwCBase + p.GetModuleSize(dwCBase);
+
+  t:= AOBSCAN('48 8B 05 ?? ?? ?? ?? 48 85 C9 48 0F 45 C1', 0);
+  dwLocal:= t + rd4(t + 3) + 7;
+end;
+
 procedure T_.FormCreate(Sender: TObject);
 begin
+
   p.GetProcessId('DNF.exe');
 
   hProcess:= OpenProcess(PROCESS_ALL_ACCESS, False, p.Id);
   hWindow:= FindWindow(nil, 'Dungeon & Fighter');
+
+  dwCBase:= p.GetModuleBase('DNF.exe');
+
+  SetVariablesWithAOBScan;
+
+  caption:= MapCharicter.Direction.ToString;
+
+
 
   CreateThread(@Callback1);
 end;
