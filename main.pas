@@ -133,6 +133,11 @@ procedure T_.FormCreate(Sender: TObject);
 begin
 
   p.GetProcessId('DNF.exe');
+  if p.Id = 0 then
+  begin
+    showmessage('process not find');
+    Exit;
+  end;
 
   hProcess:= OpenProcess(PROCESS_ALL_ACCESS, False, p.Id);
   hWindow:= FindWindow(nil, 'Dungeon & Fighter');

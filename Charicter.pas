@@ -1,7 +1,7 @@
 unit Charicter;
 
 interface
-  uses SysUtils, Windows, TlHelp32, PsAPI, MemAPI;
+  uses SysUtils, Windows, TlHelp32, PsAPI, MemAPI, StrAPI;
 
 type TVector3 = packed record
   x, y, z: Single;
@@ -63,6 +63,8 @@ type TCharicter = packed record
   const RIGHT = 1;
   function Direction: Byte;
   function Position: TVector3;
+  function ObjectList: TObjectList;
+  function isCharicter: Boolean;
 end;
 
 
@@ -76,16 +78,20 @@ function MapCharicter(const dwBase: DWORD64): TCharicter; overload;
 var
   res: TCharicter;
 begin
-  ReadProcessMemory(hProcess, Ptr(dwBase), @res, SizeOf(TCharicter), PSIZE_T(nil)^);
-  Result:= res;
+  if not ReadProcessMemory(hProcess, Ptr(dwBase), @res, SizeOf(TCharicter), PSIZE_T(nil)^) then
+    raise EAbort.Create('')
+  else
+    Result:= res;
 end;
 
 function MapCharicter: TCharicter; overload;
 var
   res: TCharicter;
 begin
-  ReadProcessMemory(hProcess, Ptr(rd4(dwLocal)), @res, SizeOf(TCharicter), PSIZE_T(nil)^);
-  Result:= res;
+  if not ReadProcessMemory(hProcess, Ptr(rd4(dwLocal)), @res, SizeOf(TCharicter), PSIZE_T(nil)^) then
+    raise EAbort.Create('')
+  else
+    Result:= res;
 end;
 
 
@@ -105,4 +111,52 @@ begin
     raise EAbort.Create('');
 end;
 
+function TCharicter.ObjectList: TObjectList;
+var
+  res: TObjectList;
+begin
+  if ReadProcessMemory(hProcess, Ptr(DWORD(Self.pList)), @res, SizeOf(TObjectList), PSIZE_T(nil)^) then
+    Result:= res
+  else
+    raise EAbort.Create('');
+end;
+
+function TCharicter.isCharicter: Boolean;
+begin
+  Result:= False;
+  case StrCase(Self.Name, ['Swordman', 'ATSwordman', 'DSSwordman', 'Mage', 'ATMage', 'Gunner', 'ATGunner', 'Fighter', 'ATFighter', 'Priest', 'ATPriest', 'Thief', 'Knight', 'DemonicLancer', 'GunBlader']) of
+    0..14:
+    begin
+      Result:= True;
+    end;
+  end;
+end;
+
+function Enemy: DWORD64;
+var
+  local, enemy: TCharicter;
+begin
+  local:= MapCharicter;
+  if local.pList <> nil then
+  begin
+    const entity = local.ObjectList.entryBase;
+    const size = (local.ObjectList.sz - entity) shr 2;
+
+    for var i:= 0 to size do
+    begin
+      try
+        const enemyBase = entity + i * 8;
+        enemy:= MapCharicter(enemyBase);
+
+        if (enemyBase <> rd4(dwLocal)) And (enemy.Team <> local.Team) And (enemy.isCharicter) then
+        begin
+          Result:= enemyBase;
+          Exit;
+        end;
+      except;
+      end;
+    end;
+  end;
+  Result:= 0;
+end;
 end.
