@@ -3,3 +3,5 @@ __recovery/*
 Win32
 Win64
 AOBScanAPI.pas
+BinaryMapping.pas
+hook-lib/__history

@@ -1,7 +1,7 @@
 unit Charicter;
 
 interface
-  uses SysUtils, Windows, TlHelp32, PsAPI, MemAPI, StrAPI;
+  uses SysUtils, Windows, TlHelp32, PsAPI, MemAPI, StrAPI, dialogs;
 
 type TVector3 = packed record
   x, y, z: Single;
@@ -70,6 +70,7 @@ end;
 
 function MapCharicter(const dwBase: DWORD64): TCharicter; overload;
 function MapCharicter: TCharicter; overload;
+function Enemy: DWORD64;
 
 implementation
   uses Main;
@@ -88,7 +89,7 @@ function MapCharicter: TCharicter; overload;
 var
   res: TCharicter;
 begin
-  if not ReadProcessMemory(hProcess, Ptr(rd4(dwLocal)), @res, SizeOf(TCharicter), PSIZE_T(nil)^) then
+  if not ReadProcessMemory(hProcess, Ptr(rd8(dwLocal)), @res, SizeOf(TCharicter), PSIZE_T(nil)^) then
     raise EAbort.Create('')
   else
     Result:= res;
@@ -97,7 +98,7 @@ end;
 
 function TCharicter.Direction: Byte;
 begin
-  Result:= rd1(rd4(Self.pDirection + 8) + $68);
+  Result:= rd1(rd8(Self.pDirection + 8) + $68);
 end;
 
 
@@ -136,23 +137,28 @@ function Enemy: DWORD64;
 var
   local, enemy: TCharicter;
 begin
+
   local:= MapCharicter;
   if local.pList <> nil then
   begin
     const entity = local.ObjectList.entryBase;
     const size = (local.ObjectList.sz - entity) shr 2;
 
-    for var i:= 0 to size do
+
+    for var i:= 0 to 1024 do
     begin
       try
-        const enemyBase = entity + i * 8;
+        const enemyBase = rd8(entity) + i * 8;
         enemy:= MapCharicter(enemyBase);
 
-        if (enemyBase <> rd4(dwLocal)) And (enemy.Team <> local.Team) And (enemy.isCharicter) then
-        begin
-          Result:= enemyBase;
-          Exit;
-        end;
+        showmessage(enemyBase.ToHexString);
+
+//        if (enemyBase <> rd8(dwLocal)) And (enemy.Team <> local.Team) And (enemy.isCharicter) then
+//        begin
+//          showmessage(enemy.Name);
+//          Result:= enemyBase;
+//          Exit;
+//        end;
       except;
       end;
     end;

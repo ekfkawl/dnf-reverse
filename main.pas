@@ -4,7 +4,8 @@ interface
 
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
-  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, ProcessAPI, Vcl.StdCtrls, DirectInput8, AOBScanAPI, Charicter, MemAPI;
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, ProcessAPI, Vcl.StdCtrls, DirectInput8, AOBScanAPI, Charicter, MemAPI, BinaryMapping,
+  SkillHook;
 
 type
   T_ = class(TForm)
@@ -24,8 +25,8 @@ var
   p: Process;
   hProcess, hWindow: THandle;
 
-  dwCBase,
-  dwLocal: DWORD64;
+  dwCBase, dwVBase,
+  dwLocal, dwSkillHook: DWORD64;
 
   swQuickKey: Boolean = True;
   swAutoDash: Boolean = True;
@@ -127,11 +128,12 @@ begin
 
   t:= AOBSCAN('48 8B 05 ?? ?? ?? ?? 48 85 C9 48 0F 45 C1', 0);
   dwLocal:= t + rd4(t + 3) + 7;
+
+  dwSkillHook:= AOBSCAN('E8 ?? ?? ?? ?? 48 3B C7 75 0D BA 06 00 00 00 48 8B CF E8', 0);
 end;
 
 procedure T_.FormCreate(Sender: TObject);
 begin
-
   p.GetProcessId('DNF.exe');
   if p.Id = 0 then
   begin
@@ -143,10 +145,14 @@ begin
   hWindow:= FindWindow(nil, 'Dungeon & Fighter');
 
   dwCBase:= p.GetModuleBase('DNF.exe');
-
+  dwVBase:= MapInitialize(dwCBase);
 
   SetVariablesWithAOBScan;
 
+
+  SkillHook.Init;
+
+//  caption:= Enemy.ToHexString;
   CreateThread(@Callback1);
 end;
 
