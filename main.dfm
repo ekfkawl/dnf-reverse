@@ -11,6 +11,7 @@ object _: T_
   Font.Style = []
   OldCreateOrder = False
   Position = poScreenCenter
+  OnClose = FormClose
   OnCreate = FormCreate
   PixelsPerInch = 96
   TextHeight = 13
@@ -20,8 +21,6 @@ object _: T_
     Width = 97
     Height = 17
     Caption = 'quick key'
-    Checked = True
-    State = cbChecked
     TabOrder = 0
     OnClick = CheckBox1Click
   end
@@ -31,9 +30,27 @@ object _: T_
     Width = 97
     Height = 17
     Caption = 'auto dash'
-    Checked = True
-    State = cbChecked
     TabOrder = 1
     OnClick = CheckBox2Click
+  end
+  object CheckBox3: TCheckBox
+    Left = 32
+    Top = 88
+    Width = 97
+    Height = 17
+    Caption = 'skill cool'
+    Checked = True
+    State = cbChecked
+    TabOrder = 2
+    OnClick = CheckBox3Click
+  end
+  object Button1: TButton
+    Left = 160
+    Top = 96
+    Width = 113
+    Height = 89
+    Caption = 'Button1'
+    TabOrder = 3
+    OnClick = Button1Click
   end
 end

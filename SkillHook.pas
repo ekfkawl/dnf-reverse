@@ -20,34 +20,36 @@ end;
 
 procedure scalable_freeHook;
 asm
-  mov rax, [rsp+$B0]
-  cmp rax, [dwSkillHook]
-  jne @next
-
-  push rcx
-  push rdx
-  mov rcx, r14  // rsi -> object
-  mov rdx, rbp  // skill id
-  call f
-  pop rdx
-  pop rcx
-
-  @next:
-  push rsi
-  push rdi
-  push r14
-  push rbp
-  sub rsp,$48
-  mov r14,rcx
-  mov rdi,[scalable_freeRef]
-  mov rdi,[rdi]
-  test rdi,rdi
-
-  jmp [scalable_freeRetn]
+//  mov rax, [rsp+$B0]
+//  cmp rax, [dwSkillHook]
+//  jne @next
+//
+//  push rcx
+//  push rdx
+//  mov rcx, r14  // rsi -> object
+//  mov rdx, rbp  // skill id
+//  call f
+//  pop rdx
+//  pop rcx
+//
+//  @next:
+//  push rsi
+//  push rdi
+//  push r14
+//  push rbp
+//  sub rsp,$48
+//  mov r14,rcx
+//  mov rdi,[scalable_freeRef]
+//  mov rdi,[rdi]
+//  test rdi,rdi
+//
+//  jmp [scalable_freeRetn]
 end;
 
 procedure Init;
 begin
+  exit;
+
   showmessage(Inject(@scalable_freeHook).ToHexString);
   exit;
 
